@@ -13,12 +13,12 @@ export class FileUploadService {
   constructor(
     private readonly fileUploadRepository: FileUploadRepository,
     @InjectRepository(Products)
-    private readonly productsRepository: Repository<Products>,
+    private readonly productsRepository: Repository<Products>
   ) {}
 
   async uploadFiles(
     files: Express.Multer.File[],
-    productId: string,
+    productId: string
   ): Promise<Products> {
     let product: Products | null;
 
@@ -29,7 +29,7 @@ export class FileUploadService {
     } catch (error) {
       throw new InternalServerErrorException(
         'Error fetching product: ' +
-          (error instanceof Error ? error.message : String(error)),
+          (error instanceof Error ? error.message : String(error))
       );
     }
 
@@ -39,13 +39,13 @@ export class FileUploadService {
 
     // Subir múltiples archivos
     const uploadedFiles = await Promise.all(
-      files.map((file) => this.fileUploadRepository.uploadFile(file)),
+      files.map(file => this.fileUploadRepository.uploadFile(file))
     );
 
     // Obtener URLs de manera segura
     const newImgs: string[] = uploadedFiles
-      .filter((file) => file && typeof file.secure_url === 'string')
-      .map((file) => file.secure_url);
+      .filter(file => file && typeof file.secure_url === 'string')
+      .map(file => file.secure_url);
 
     const existingImgs: string[] = Array.isArray(product.imgs)
       ? product.imgs

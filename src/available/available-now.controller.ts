@@ -5,26 +5,27 @@ import { AvailableNowService } from './available-now.service';
 
 @Controller('available-now')
 export class AvailableNowController {
-    constructor(
-        private readonly availableNowService: AvailableNowService
-    ) {}
+  constructor(private readonly availableNowService: AvailableNowService) {}
 
-    @Post()
-    async addEmail(@Body() addWaitingProduct:CreateAvailableNowDto):Promise<AvailabeNow> {
-        if (!addWaitingProduct) {
-          
-            throw new Error('Data not received');
-        }
-        console.log(addWaitingProduct);
-        
-        return await this.availableNowService.availableNowService(addWaitingProduct)
+  @Post()
+  async addEmail(
+    @Body() addWaitingProduct: CreateAvailableNowDto
+  ): Promise<AvailabeNow> {
+    if (!addWaitingProduct) {
+      throw new Error('Data not received');
     }
+    console.log(addWaitingProduct);
 
-    @Get(':productId')
+    return await this.availableNowService.availableNowService(
+      addWaitingProduct
+    );
+  }
 
-    async getEmails(@Param('productId') productId:string):Promise<AvailabeNow[]> {
-        if(!productId) throw new Error('productId not received')
-        return await this.availableNowService.getEmails(productId)
-    }
-
+  @Get(':productId')
+  async getEmails(
+    @Param('productId') productId: string
+  ): Promise<AvailabeNow[]> {
+    if (!productId) throw new Error('productId not received');
+    return await this.availableNowService.getEmails(productId);
+  }
 }

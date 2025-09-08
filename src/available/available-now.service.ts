@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAvailableNowDto } from './addWaitingProduct.dto';
 import { AvailabeNow } from 'src/entities/availableNow.entity';
 import { Repository } from 'typeorm';
@@ -20,17 +24,17 @@ export class AvailableNowService {
       throw new Error('Data not received');
     }
     const product = await this.productsRepository.findOneBy({
-      id: addWaitingProduct.productId
+      id: addWaitingProduct.productId,
     });
     if (!product)
       throw new NotFoundException(
-      `No se encontro el producto con id: ${addWaitingProduct.productId}`
+        `No se encontro el producto con id: ${addWaitingProduct.productId}`
       );
     const availableNow = new AvailabeNow();
     availableNow.name = addWaitingProduct.name;
     const foundEmail = await this.availableNowRepository.findOneBy({
-      email: addWaitingProduct.email
-    })
+      email: addWaitingProduct.email,
+    });
     if (foundEmail) {
       throw new ConflictException('Email already exists');
     }
@@ -43,17 +47,17 @@ export class AvailableNowService {
     const emailsAndNames = await this.availableNowRepository.find({
       where: {
         product: {
-          id: productId
-        }
+          id: productId,
+        },
       },
-      select: ['email', 'name']
+      select: ['email', 'name'],
     });
     return emailsAndNames;
   }
 
   async notifyUsersWhenStockRestored(productId: string): Promise<void> {
     const product = await this.productsRepository.findOne({
-      where: { id: productId }
+      where: { id: productId },
     });
 
     if (!product) {
@@ -65,17 +69,15 @@ export class AvailableNowService {
     const interestedUsers = await this.getEmails(productId);
 
     if (interestedUsers.length > 0) {
-
       const mailSent = await this.sendNotificationEmail(
         interestedUsers,
         product
       );
       if (mailSent === 'ok') {
         await this.availableNowRepository.delete({
-          product: { id: productId }
+          product: { id: productId },
         });
       }
-
     }
   }
 
@@ -83,7 +85,7 @@ export class AvailableNowService {
     users: AvailabeNow[],
     product: Products
   ): Promise<string> {
-    const mailList = users.map((user) => user.email);
+    const mailList = users.map(user => user.email);
 
     const msg = {
       to: mailList,
@@ -98,7 +100,7 @@ export class AvailableNowService {
                         <p>El producto <strong> ${product.name}</strong> está disponible nuevamente en nuestro stock. Encontralo en https://top-carteras.vercel.app/</p>
                     </body>
                     </html>
-                `
+                `,
     };
     try {
       await sgMail.send(msg);
