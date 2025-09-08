@@ -20,6 +20,14 @@ export class Categories {
     })
     name: string;
 
+    @Column({
+        type: "varchar",
+        length: 50,
+        nullable: true,
+        unique: true
+    })
+    categoryImage?: string;
+
     @OneToMany(() => Products, (products) => products.category)
     @JoinColumn()
     products: Products[]
