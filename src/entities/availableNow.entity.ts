@@ -1,17 +1,17 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Products } from "./product.entity";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Products } from './product.entity';
 
 @Entity()
-export class AvailabeNow{
-    @PrimaryGeneratedColumn('uuid')
-    id: string
+export class AvailabeNow {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column({type:'varchar', nullable: false})
-    name: string
-    
-    @Column({type:'varchar', nullable: false})
-    email: string
+  @Column({ type: 'varchar', nullable: false })
+  name: string;
 
-    @ManyToOne(()=>Products, (product)=>product.availableNow)
-    product:Products
+  @Column({ type: 'varchar', nullable: false })
+  email: string;
+
+  @ManyToOne(() => Products, product => product.availableNow)
+  product: Products;
 }

@@ -10,9 +10,9 @@ import { CategoreiesModule } from 'src/categories/categoreies.module';
   imports: [
     TypeOrmModule.forFeature([Products]),
     AvailableNowModule,
-    CategoreiesModule
+    CategoreiesModule,
   ],
   controllers: [ProductsController],
-  providers: [ProductsService]
+  providers: [ProductsService],
 })
 export class ProductsModule {}

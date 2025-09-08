@@ -15,7 +15,7 @@ const databaseConfig = (): DataSourceOptions => ({
 });
 
 export default registerAs('typeorm', databaseConfig);
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
 const connectionSource: DataSource = new DataSource(databaseConfig());
 
 export { connectionSource };

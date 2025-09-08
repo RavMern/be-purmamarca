@@ -9,6 +9,6 @@ import { FileUploadRepository } from './file-upload.repository';
 @Module({
   imports: [TypeOrmModule.forFeature([Products])],
   controllers: [FileUploadController],
-  providers: [FileUploadService, CloudinaryConfig,FileUploadRepository]
+  providers: [FileUploadService, CloudinaryConfig, FileUploadRepository],
 })
 export class FileUploadModule {}
