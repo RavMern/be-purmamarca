@@ -3,6 +3,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { FileUploadService } from './file-upload.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Controller, Post,Param, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, UseGuards, UploadedFiles, BadRequestException } from '@nestjs/common';
+import { Express } from 'express';
 
 @Controller('files')
 export class FileUploadController {
