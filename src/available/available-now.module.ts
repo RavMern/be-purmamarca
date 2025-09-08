@@ -6,11 +6,9 @@ import { AvailabeNow } from 'src/entities/availableNow.entity';
 import { Products } from 'src/entities/product.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([AvailabeNow, Products]), 
-  ],
+  imports: [TypeOrmModule.forFeature([AvailabeNow, Products])],
   providers: [AvailableNowService],
   controllers: [AvailableNowController],
-  exports: [AvailableNowModule, AvailableNowService]
+  exports: [AvailableNowModule, AvailableNowService],
 })
 export class AvailableNowModule {}

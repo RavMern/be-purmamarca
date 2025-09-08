@@ -1,23 +1,27 @@
-import {Entity, Column, OneToOne, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from "typeorm"
-import { Users } from "./users.entity";
-import { OrderDetails } from "./orderdetails.entity";
-@Entity(
-    {
-        name: "orders"
-    }
-)
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { OrderDetails } from './orderdetails.entity';
+import { Users } from './users.entity';
+@Entity({
+  name: 'orders',
+})
 export class Orders {
-    @PrimaryGeneratedColumn('uuid')
-    id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column()
-    date: Date
+  @Column()
+  date: Date;
 
-    @OneToOne(()=>OrderDetails, (orderDetails)=>orderDetails.order)
-    orderDetails:OrderDetails;
+  @OneToOne(() => OrderDetails, orderDetails => orderDetails.order)
+  orderDetails: OrderDetails;
 
-    @ManyToOne(()=>Users,(user)=>user.orders)
-    @JoinColumn({name:"user_id"})
-    user:Users
-
+  @ManyToOne(() => Users, user => user.orders)
+  @JoinColumn({ name: 'user_id' })
+  user: Users;
 }

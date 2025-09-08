@@ -54,3 +54,58 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Firebase configuration files and sensitive data
+src/config/firebase/*.json
+src/config/firebase-service-account.json
+firebase-service-account.json
+firebase-adminsdk-*.json
+firebase-config.json
+firebase.json
+.firebaserc
+firebase-debug.log
+firebase-debug.*.log
+
+# Cloudinary configuration and sensitive data
+src/config/cloudinary.json
+cloudinary.json
+cloudinary-config.json
+.cloudinary/
+
+# API Keys and Secrets
+*.key
+*.pem
+*.p12
+*.pfx
+*secret*
+*private*
+*credentials*
+
+# Environment variables and configuration
+.env*
+!.env.example
+config.json
+secrets.json
+credentials.json
+
+# Service account files
+*service-account*.json
+*serviceAccount*.json
+google-service-account.json
+google-credentials.json
+
+# Firebase Admin SDK
+firebase-admin-*.json
+admin-sdk-*.json
+
+# Cloudinary upload presets and settings
+cloudinary-presets.json
+upload-presets.json
+
+# Temporary upload directories
+uploads/
+temp-uploads/
+tmp/
+
+# Ignore package-lock.json
+package-lock.json
