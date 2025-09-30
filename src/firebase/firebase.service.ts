@@ -1,6 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import * as admin from 'firebase-admin';
-import * as path from 'path';
 import * as fs from 'fs';
 import { Bucket } from '@google-cloud/storage';
 
@@ -9,19 +8,17 @@ export class FirebaseService implements OnModuleInit {
   private bucket: Bucket;
 
   onModuleInit() {
-    const serviceAccountPath = path.join(__dirname, 'firebase-config.json');
+    const serviceAccountPath = process.env.FIREBASE_CREDENTIALS;
 
-    if (!fs.existsSync(serviceAccountPath)) {
-      throw new Error('Firebase service account file not found');
+    if (!serviceAccountPath || !fs.existsSync(serviceAccountPath)) {
+      throw new Error(
+        `Firebase service account file not found at ${serviceAccountPath}`
+      );
     }
 
     const serviceAccount = JSON.parse(
       fs.readFileSync(serviceAccountPath, 'utf-8')
     ) as admin.ServiceAccount;
-
-    if (!serviceAccount) {
-      throw new Error('Firebase service account not found');
-    }
 
     const firebaseConfig: admin.AppOptions = {
       credential: admin.credential.cert(serviceAccount),

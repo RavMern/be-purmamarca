@@ -1,17 +1,16 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import databaseConfig from './config/database.config';
 
 // Import all modules
 import { AuthModule } from './auth/auth.module';
-import { ProductsModule } from './products/products.module';
+import { AvailableNowModule } from './available/available-now.module';
 import { CategoreiesModule } from './categories/categoreies.module';
 import { FileUploadModule } from './file-upload/file-upload.module';
-import { AvailableNowModule } from './available/available-now.module';
-import { MailerModule } from './mailer/mailer.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -32,7 +31,7 @@ import { MailerModule } from './mailer/mailer.module';
     CategoreiesModule,
     FileUploadModule,
     AvailableNowModule,
-    MailerModule,
+    // MailerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
