@@ -1,16 +1,24 @@
 import {
   BadRequestException,
   Controller,
-  Put,
   Post,
+  Put,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ImagesService } from './images.service';
-import { fileUploadOptions } from './validators/file-upload.validator';
 import { FileUploadResponseDto } from './validators/file-upload.dto';
+import { fileUploadOptions } from './validators/file-upload.validator';
 
+@ApiTags('images')
 @Controller('images')
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
@@ -29,6 +37,28 @@ export class ImagesController {
       fileUploadOptions()
     )
   )
+  @ApiOperation({ summary: 'Subir múltiples imágenes de un evento' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        ceremonia_url_location: { type: 'string', format: 'binary' },
+        recepcion_url_location: { type: 'string', format: 'binary' },
+        image_url: { type: 'string', format: 'binary' },
+        logo_file_0: { type: 'string', format: 'binary' },
+        logo_file_1: { type: 'string', format: 'binary' },
+        logo_file_2: { type: 'string', format: 'binary' },
+      },
+      required: ['ceremonia_url_location', 'image_url'],
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Imágenes subidas exitosamente',
+    type: FileUploadResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Archivos inválidos o faltantes' })
   async multipleUpload(
     @UploadedFiles()
     files: {
@@ -43,8 +73,7 @@ export class ImagesController {
     const ceremonia = files.ceremonia_url_location?.[0];
     const image = files.image_url?.[0];
     const recepcion = files.recepcion_url_location?.[0];
-
-    const logos = (['logo_file_0', 'logo_file_1', 'logo_file_2'] as const)
+    const logos = ['logo_file_0', 'logo_file_1', 'logo_file_2']
       .map(name => files[name]?.[0])
       .filter((file): file is Express.Multer.File => Boolean(file));
 
@@ -89,6 +118,26 @@ export class ImagesController {
       fileUploadOptions()
     )
   )
+  @ApiOperation({ summary: 'Actualizar múltiples imágenes de un evento' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        ceremonia_url_location: { type: 'string', format: 'binary' },
+        recepcion_url_location: { type: 'string', format: 'binary' },
+        image_url: { type: 'string', format: 'binary' },
+        logo_file_0: { type: 'string', format: 'binary' },
+        logo_file_1: { type: 'string', format: 'binary' },
+        logo_file_2: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Imágenes actualizadas exitosamente',
+    type: FileUploadResponseDto,
+  })
   async updateMultipleUpload(
     @UploadedFiles()
     files: {
@@ -103,8 +152,7 @@ export class ImagesController {
     const ceremonia = files.ceremonia_url_location?.[0];
     const image = files.image_url?.[0];
     const recepcion = files.recepcion_url_location?.[0];
-
-    const logos = (['logo_file_0', 'logo_file_1', 'logo_file_2'] as const)
+    const logos = ['logo_file_0', 'logo_file_1', 'logo_file_2']
       .map(name => files[name]?.[0])
       .filter((file): file is Express.Multer.File => Boolean(file));
 
