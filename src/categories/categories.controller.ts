@@ -16,11 +16,20 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Categories } from '../entities/categories.entity';
 import { ImagesService } from '../images/images.service';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/categories.dto';
 
+@ApiTags('categories')
 @Controller('categories')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class CategoriesController {
@@ -29,35 +38,66 @@ export class CategoriesController {
     private readonly imagesService: ImagesService
   ) {}
 
-  // CREATE - Crear nueva categoría
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Crear nueva categoría' })
+  @ApiResponse({
+    status: 201,
+    description: 'Categoría creada exitosamente',
+    type: Categories,
+  })
   async create(
     @Body() createCategoryDto: CreateCategoryDto
   ): Promise<Categories> {
     return await this.categoriesService.create(createCategoryDto);
   }
 
-  // READ - Obtener todas las categorías
   @Get()
+  @ApiOperation({ summary: 'Obtener todas las categorías' })
+  @ApiResponse({
+    status: 200,
+    description: 'Listado de categorías',
+    type: [Categories],
+  })
   async findAll(): Promise<Categories[]> {
     return await this.categoriesService.findAll();
   }
 
-  // READ - Obtener categoría por ID
   @Get(':id')
+  @ApiOperation({ summary: 'Obtener categoría por ID' })
+  @ApiParam({ name: 'id', description: 'ID de la categoría', type: String })
+  @ApiResponse({
+    status: 200,
+    description: 'Categoría encontrada',
+    type: Categories,
+  })
   async findOne(@Param('id') id: string): Promise<Categories> {
     return await this.categoriesService.findOne(id);
   }
 
-  // READ - Obtener categoría por nombre
   @Get('name/:name')
+  @ApiOperation({ summary: 'Obtener categoría por nombre' })
+  @ApiParam({
+    name: 'name',
+    description: 'Nombre de la categoría',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Categoría encontrada',
+    type: Categories,
+  })
   async findByName(@Param('name') name: string): Promise<Categories> {
     return await this.categoriesService.findByName(name);
   }
 
-  // UPDATE - Actualizar categoría
   @Patch(':id')
+  @ApiOperation({ summary: 'Actualizar categoría' })
+  @ApiResponse({
+    status: 200,
+    description: 'Categoría actualizada',
+    type: Categories,
+  })
   async update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto
@@ -65,17 +105,42 @@ export class CategoriesController {
     return await this.categoriesService.update(id, updateCategoryDto);
   }
 
-  // DELETE - Eliminar categoría
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Eliminar categoría' })
+  @ApiResponse({ status: 204, description: 'Categoría eliminada' })
   async remove(@Param('id') id: string): Promise<void> {
     return await this.categoriesService.remove(id);
   }
 
-  // UPLOAD - Subir imagen de categoría
   @Post(':id/upload-image')
   @UseInterceptors(FileInterceptor('image'))
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Subir imagen de categoría' })
+  @ApiConsumes('multipart/form-data')
+  @ApiParam({ name: 'id', description: 'ID de la categoría', type: String })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'Archivo de imagen',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Imagen subida exitosamente',
+    schema: {
+      example: {
+        message: 'Imagen de categoría subida exitosamente',
+        imageUrl: 'https://...',
+      },
+    },
+  })
   async uploadCategoryImage(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File
@@ -84,7 +149,6 @@ export class CategoriesController {
       throw new BadRequestException('No se ha proporcionado ninguna imagen');
     }
 
-    // Validar tipo de archivo
     const allowedMimeTypes = [
       'image/jpeg',
       'image/jpg',
@@ -98,32 +162,17 @@ export class CategoriesController {
       );
     }
 
-    // Validar tamaño del archivo (máximo 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
       throw new BadRequestException(
         'El archivo es demasiado grande. Máximo 5MB permitido'
       );
     }
 
-    try {
-      // Verificar que la categoría existe
-      await this.categoriesService.findOne(id);
+    await this.categoriesService.findOne(id);
+    const imageUrl = await this.imagesService.processCategoryImage(file);
+    await this.categoriesService.updateCategoryImage(id, imageUrl);
 
-      // Subir imagen a Firebase Storage
-      const imageUrl = await this.imagesService.processCategoryImage(file);
-
-      // Actualizar la categoría con la URL de la imagen
-      await this.categoriesService.updateCategoryImage(id, imageUrl);
-
-      return {
-        message: 'Imagen de categoría subida exitosamente',
-        imageUrl,
-      };
-    } catch (error) {
-      throw new BadRequestException(
-        `Error al subir la imagen: ${error.message}`
-      );
-    }
+    return { message: 'Imagen de categoría subida exitosamente', imageUrl };
   }
 }
