@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: '${DB_PASSWORD:-postgres}'
+      POSTGRES_DB: purmamarca_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app:delegated
+      - /usr/src/app/node_modules
+      # monta el firebase json local (lee más abajo dónde ponerlo)
+      - ./src/config/firebase/firebase-service-account.json:/usr/src/app/src/config/firebase/firebase-service-account.json:ro
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=purmamarca_db
+      - PORT=3000
+      - NODE_ENV=development
+      - JWT_SECRET=${JWT_SECRET:-JuanRomanRiquelme}
+      - FIREBASE_CREDENTIALS=/usr/src/app/src/config/firebase/firebase-service-account.json
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+    command: sh -c "npm install --silent && npm run start:dev"
+    restart: unless-stopped
+
+volumes:
+  db_data:
