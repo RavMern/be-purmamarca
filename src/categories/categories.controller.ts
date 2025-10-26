@@ -17,6 +17,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiOperation,
@@ -40,12 +41,15 @@ export class CategoriesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Crear nueva categoría' })
+  @ApiOperation({ summary: 'Crear una nueva categoría' })
+  @ApiBody({ type: CreateCategoryDto })
   @ApiResponse({
     status: 201,
     description: 'Categoría creada exitosamente',
     type: Categories,
   })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
+  @ApiBearerAuth()
   async create(
     @Body() createCategoryDto: CreateCategoryDto
   ): Promise<Categories> {
@@ -56,7 +60,7 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Obtener todas las categorías' })
   @ApiResponse({
     status: 200,
-    description: 'Listado de categorías',
+    description: 'Lista de categorías obtenida exitosamente',
     type: [Categories],
   })
   async findAll(): Promise<Categories[]> {
@@ -64,40 +68,47 @@ export class CategoriesController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Obtener categoría por ID' })
-  @ApiParam({ name: 'id', description: 'ID de la categoría', type: String })
+  @ApiOperation({ summary: 'Obtener una categoría por ID' })
+  @ApiParam({ name: 'id', description: 'ID de la categoría', type: 'string' })
   @ApiResponse({
     status: 200,
-    description: 'Categoría encontrada',
+    description: 'Categoría obtenida exitosamente',
     type: Categories,
   })
+  @ApiResponse({ status: 404, description: 'Categoría no encontrada' })
   async findOne(@Param('id') id: string): Promise<Categories> {
     return await this.categoriesService.findOne(id);
   }
 
   @Get('name/:name')
-  @ApiOperation({ summary: 'Obtener categoría por nombre' })
+  @ApiOperation({ summary: 'Obtener una categoría por nombre' })
   @ApiParam({
     name: 'name',
     description: 'Nombre de la categoría',
-    type: String,
+    type: 'string',
   })
   @ApiResponse({
     status: 200,
-    description: 'Categoría encontrada',
+    description: 'Categoría obtenida exitosamente',
     type: Categories,
   })
+  @ApiResponse({ status: 404, description: 'Categoría no encontrada' })
   async findByName(@Param('name') name: string): Promise<Categories> {
     return await this.categoriesService.findByName(name);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Actualizar categoría' })
+  @ApiOperation({ summary: 'Actualizar una categoría' })
+  @ApiParam({ name: 'id', description: 'ID de la categoría', type: 'string' })
+  @ApiBody({ type: UpdateCategoryDto })
   @ApiResponse({
     status: 200,
-    description: 'Categoría actualizada',
+    description: 'Categoría actualizada exitosamente',
     type: Categories,
   })
+  @ApiResponse({ status: 404, description: 'Categoría no encontrada' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
+  @ApiBearerAuth()
   async update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto
@@ -107,8 +118,11 @@ export class CategoriesController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Eliminar categoría' })
-  @ApiResponse({ status: 204, description: 'Categoría eliminada' })
+  @ApiOperation({ summary: 'Eliminar una categoría' })
+  @ApiParam({ name: 'id', description: 'ID de la categoría', type: 'string' })
+  @ApiResponse({ status: 204, description: 'Categoría eliminada exitosamente' })
+  @ApiResponse({ status: 404, description: 'Categoría no encontrada' })
+  @ApiBearerAuth()
   async remove(@Param('id') id: string): Promise<void> {
     return await this.categoriesService.remove(id);
   }
@@ -117,30 +131,31 @@ export class CategoriesController {
   @UseInterceptors(FileInterceptor('image'))
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Subir imagen de categoría' })
+  @ApiParam({ name: 'id', description: 'ID de la categoría', type: 'string' })
   @ApiConsumes('multipart/form-data')
-  @ApiParam({ name: 'id', description: 'ID de la categoría', type: String })
-  @ApiBody({
+  @ApiResponse({
+    status: 200,
+    description: 'Imagen subida exitosamente',
     schema: {
       type: 'object',
       properties: {
-        image: {
+        message: {
           type: 'string',
-          format: 'binary',
-          description: 'Archivo de imagen',
+          example: 'Imagen de categoría subida exitosamente',
+        },
+        imageUrl: {
+          type: 'string',
+          example: 'https://firebasestorage.googleapis.com/...',
         },
       },
     },
   })
   @ApiResponse({
-    status: 200,
-    description: 'Imagen subida exitosamente',
-    schema: {
-      example: {
-        message: 'Imagen de categoría subida exitosamente',
-        imageUrl: 'https://...',
-      },
-    },
+    status: 400,
+    description: 'Archivo inválido o error en la subida',
   })
+  @ApiResponse({ status: 404, description: 'Categoría no encontrada' })
+  @ApiBearerAuth()
   async uploadCategoryImage(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File
