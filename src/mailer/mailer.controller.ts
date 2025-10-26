@@ -1,21 +1,46 @@
-// import { Body, Controller, Post } from '@nestjs/common';
-// import { MailerService } from './mailer.service';
-// import { NewsLetterFormDto } from './newsLetterForm.dto';
+import { Body, Controller, Post } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { MailerService } from './mailer.service';
+import { NewsLetterFormDto } from './newsLetterForm.dto';
 
-// @Controller('mailer')
-// export class MailerController {
-//   constructor(private readonly appService: MailerService) {}
+@ApiTags('mailer')
+@Controller('mailer')
+export class MailerController {
+  constructor(private readonly appService: MailerService) {}
 
-//   @Post('newsletter')
-//   async sendNewsletterMailController(
-//     @Body() newsLetterForm: NewsLetterFormDto
-//   ) {
-//     if (
-//       !newsLetterForm.title ||
-//       !newsLetterForm.subtitle ||
-//       !newsLetterForm.description
-//     )
-//       return 'Titulo, Subtitulo y Descripción son requeridos.';
+  @Post('newsletter')
+  @ApiOperation({ summary: 'Enviar newsletter por email' })
+  @ApiBody({ type: NewsLetterFormDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Newsletter enviado exitosamente',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Newsletter sent successfully' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos o errores de validación',
+  })
+  @ApiBearerAuth()
+  async sendNewsletterMailController(
+    @Body() newsLetterForm: NewsLetterFormDto
+  ) {
+    if (
+      !newsLetterForm.title ||
+      !newsLetterForm.subtitle ||
+      !newsLetterForm.description
+    )
+      return 'Titulo, Subtitulo y Descripción son requeridos.';
 
 //     if (newsLetterForm.title.length < 5 || newsLetterForm.title.length > 20)
 //       return 'Titulo, debe tener entre 5 y 20 caracteres.';

@@ -1,5 +1,12 @@
 /* eslint-disable prettier/prettier */
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { AvailabeNow } from './availableNow.entity';
 import { Categories } from './categories.entity';
 
@@ -11,41 +18,41 @@ export class Products {
   @Column({
     type: 'varchar',
     length: 55,
-    nullable: false
+    nullable: false,
   })
   name: string;
 
   @Column({
     type: 'text',
-    nullable: false
+    nullable: false,
   })
   description: string;
 
   @Column({
     type: 'text',
-    nullable: false
+    nullable: false,
   })
   color: string;
 
   @Column({
     type: 'uuid',
-    nullable: false
+    nullable: false,
   })
   categoryId: string;
 
-  @ManyToOne(() => Categories, (category) => category.products)
+  @ManyToOne(() => Categories, category => category.products)
   @JoinColumn({ name: 'categoryId' })
   category: Categories;
 
   @Column({
     type: 'int',
-    nullable: false
+    nullable: false,
   })
   price: number;
 
   @Column({
     type: 'int',
-    nullable: false
+    nullable: false,
   })
   stock: number;
 
@@ -55,29 +62,35 @@ export class Products {
   @Column({
     type: 'boolean',
     nullable: false,
-    default: false
+    default: false,
   })
   onSale: boolean;
 
   @Column({
     type: 'int',
-    nullable: true
+    nullable: true,
   })
   priceOnSale?: number;
 
   @Column({
     type: 'varchar',
-    nullable: true
+    nullable: true,
   })
   size?: string;
 
   @Column({
     type: 'boolean',
     nullable: false,
-    default: true
+    default: true,
   })
   available?: boolean;
 
-  @OneToMany(()=>AvailabeNow,(availableNow)=>availableNow.product)
-  availableNow:AvailabeNow[]
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @OneToMany(() => AvailabeNow, availableNow => availableNow.product)
+  availableNow: AvailabeNow[];
 }
