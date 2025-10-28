@@ -29,7 +29,7 @@ export class Categories {
     description: 'URL de la imagen de la categoría',
     required: false,
   })
-  @Column({ type: 'varchar', length: 50, nullable: true, unique: true })
+  @Column({ type: 'text', nullable: true, unique: true })
   categoryImage?: string;
 
   @ApiProperty({

@@ -13,7 +13,6 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiConsumes,
   ApiOperation,
   ApiParam,
@@ -22,31 +21,39 @@ import {
 } from '@nestjs/swagger';
 import { FileUploadService } from './file-upload.service';
 
-@ApiTags('files')
+@ApiTags('file-upload')
 @Controller('files')
 export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 
   @ApiBearerAuth()
   @Post('uploadimages/:id')
-  @UseInterceptors(FilesInterceptor('files', 10))
-  @ApiOperation({ summary: 'Subir imágenes de producto' })
-  @ApiParam({ name: 'id', description: 'ID del producto', type: String })
+  @UseInterceptors(FilesInterceptor('files', 10)) // 'files' es el nombre del campo y '10' es el máximo número de archivos
+  @ApiOperation({ summary: 'Subir múltiples imágenes para un producto' })
+  @ApiParam({ name: 'id', description: 'ID del producto', type: 'string' })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
+  @ApiResponse({
+    status: 200,
+    description: 'Imágenes subidas exitosamente',
     schema: {
       type: 'object',
       properties: {
-        files: {
+        message: { type: 'string', example: 'Files uploaded successfully' },
+        urls: {
           type: 'array',
-          items: { type: 'string', format: 'binary' },
-          description: 'Archivos de imagen a subir (max 10)',
+          items: { type: 'string' },
+          example: [
+            'https://firebasestorage.googleapis.com/...',
+            'https://firebasestorage.googleapis.com/...',
+          ],
         },
       },
     },
   })
-  @ApiResponse({ status: 201, description: 'Imágenes subidas exitosamente' })
-  @ApiResponse({ status: 400, description: 'Archivos inválidos o no enviados' })
+  @ApiResponse({
+    status: 400,
+    description: 'Archivos inválidos o error en la subida',
+  })
   async uploadFiles(
     @Param('id') productId: string,
     @UploadedFiles(
@@ -55,12 +62,12 @@ export class FileUploadController {
           new MaxFileSizeValidator({
             maxSize: 20000000,
             message: 'File is too large',
-          }),
-          new FileTypeValidator({ fileType: /(jpg|jpeg|png|gif|webp)$/ }),
+          }), // Máximo tamaño permitido
+          new FileTypeValidator({ fileType: /(jpg|jpeg|png|gif|webp)$/ }), // Tipos de archivo permitidos
         ],
       })
     )
-    files: Express.Multer.File[]
+    files: Express.Multer.File[] // Cambiado a un array de archivos
   ) {
     if (!files || files.length === 0) {
       throw new BadRequestException('Files are required');
