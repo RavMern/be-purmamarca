@@ -25,6 +25,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { fileUploadOptions } from 'src/images/validators/file-upload.validator';
 import { Categories } from '../entities/categories.entity';
 import { ImagesService } from '../images/images.service';
 import { CategoriesService } from './categories.service';
@@ -128,39 +129,17 @@ export class CategoriesController {
   }
 
   @Post(':id/upload-image')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('image', fileUploadOptions()))
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Subir imagen de categoría' })
   @ApiParam({ name: 'id', description: 'ID de la categoría', type: 'string' })
   @ApiConsumes('multipart/form-data')
-  @ApiResponse({
-    status: 200,
-    description: 'Imagen subida exitosamente',
-    schema: {
-      type: 'object',
-      properties: {
-        message: {
-          type: 'string',
-          example: 'Imagen de categoría subida exitosamente',
-        },
-        imageUrl: {
-          type: 'string',
-          example: 'https://firebasestorage.googleapis.com/...',
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Archivo inválido o error en la subida',
-  })
-  @ApiResponse({ status: 404, description: 'Categoría no encontrada' })
-  @ApiBearerAuth()
   async uploadCategoryImage(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File
   ): Promise<{ message: string; imageUrl: string }> {
-    if (!file) {
+    console.log('Archivo recibido:', file);
+    if (!file || !file.buffer) {
       throw new BadRequestException('No se ha proporcionado ninguna imagen');
     }
 
