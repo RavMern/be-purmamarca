@@ -62,7 +62,7 @@ export class createProductDto {
     ],
   })
   @IsArray({ message: 'Las imágenes deben ser un array' })
-  @IsNotEmpty({ message: 'Las imágenes son requeridas' })
+  @IsOptional({ message: 'Las imágenes son requeridas' })
   imgs: string[];
 
   @ApiProperty({ description: 'Tamaño del producto', example: 'M' })

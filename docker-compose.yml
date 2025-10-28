@@ -32,6 +32,7 @@ services:
       - NODE_ENV=development
       - JWT_SECRET=${JWT_SECRET:-JuanRomanRiquelme}
       - FIREBASE_CREDENTIALS=/usr/src/app/src/config/firebase/firebase-service-account.json
+      - STORAGE_URL=imgstorage-d91df.appspot.com
     ports:
       - '3000:3000'
     depends_on:
