@@ -19,20 +19,16 @@ export class ProductsService {
     private readonly availableNowService: AvailableNowService,
     private readonly categoriesService: CategoriesService
   ) {}
+
   getProducts() {
-    return this.productsRepository.find({
-      relations: ['category'],
-    });
+    return this.productsRepository.find({ relations: ['category'] });
   }
 
   async createProducts(data: createProductDto): Promise<Products> {
-    // Validar que la categoría existe
-    if (!data.categoryId) {
+    if (!data.categoryId)
       throw new BadRequestException('La categoría es requerida');
-    }
 
     try {
-      // Verificar que la categoría existe
       await this.categoriesService.findOne(data.categoryId);
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -43,27 +39,25 @@ export class ProductsService {
       throw error;
     }
 
-    const createProductDB = await this.productsRepository.create(data);
+    const createProductDB = this.productsRepository.create(data);
     return await this.productsRepository.save(createProductDB);
   }
+
   async getProductsById(id: string): Promise<Products> {
-    const foundedProduct = await this.productsRepository.findOne({
+    const product = await this.productsRepository.findOne({
       where: { id },
       relations: ['category'],
     });
-
-    if (!foundedProduct) {
+    if (!product)
       throw new NotFoundException(`Producto con ID ${id} no encontrado`);
-    }
-
-    return foundedProduct;
+    return product;
   }
+
   async updateProductsById(id: string, data: updateProductDto) {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product)
       throw new NotFoundException(`No se encontró el producto con id: ${id}`);
 
-    // Si se está actualizando la categoría, validar que existe
     if (data.categoryId) {
       try {
         await this.categoriesService.findOne(data.categoryId);
@@ -77,32 +71,27 @@ export class ProductsService {
       }
     }
 
-    console.log('data.stock', data.stock);
-
-    if (data.stock) {
-      const checkStock = await this.productsRepository.findOne({
-        where: { id },
-      });
-      console.log('checkStock.stock', checkStock?.stock);
-
-      if (checkStock?.stock === 0) {
-        console.log('El stock de este producto era 0 antes de ser actualizado');
-        await this.availableNowService.notifyUsersWhenStockRestored(id);
-      }
+    if (data.stock !== undefined && product.stock === 0 && data.stock > 0) {
+      await this.availableNowService.notifyUsersWhenStockRestored(id);
     }
 
-    return await this.productsRepository.update(id, data);
+    await this.productsRepository.update(id, data);
+    return await this.getProductsById(id);
   }
-  patchProductsById(id: string) {
-    throw new Error('Method not implemented.');
-    return this.productsRepository.update(id, { available: false });
+
+  async patchProductsById(id: string, partialData: Partial<Products>) {
+    const product = await this.productsRepository.findOne({ where: { id } });
+    if (!product)
+      throw new NotFoundException(`Producto con ID ${id} no encontrado`);
+
+    Object.assign(product, partialData);
+    await this.productsRepository.save(product);
+    return product;
   }
 
   async deleteProductsById(id: string) {
-    const findProduct = await this.productsRepository.findOne({
-      where: { id },
-    });
-    if (!findProduct)
+    const product = await this.productsRepository.findOne({ where: { id } });
+    if (!product)
       throw new NotFoundException(`No se encontró el producto con id: ${id}`);
 
     return await this.productsRepository.delete(id);
