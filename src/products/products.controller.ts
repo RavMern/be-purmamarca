@@ -1,8 +1,6 @@
 /* eslint-disable prettier/prettier */
 import {
-  BadRequestException,
-  Body,
-  Controller,
+  BadRequestException, Body, Controller,
   Delete,
   Get,
   Param,
