@@ -138,16 +138,27 @@ export class ProductsService {
 
         return await this.productsRepository.update(id, data);
     }
-    patchProductsById(id: string) {
-        throw new Error('Method not implemented.');
-        return this.productsRepository.update(id, { available: false });
-    }
 
-    async deleteProductsById(id: string) {
-        const findProduct = await this.productsRepository.findOne({ where: { id } });
-        if (!findProduct) throw new NotFoundException(`No se encontró el producto con id: ${id}`);
+  patchProductsById(id: string) {
+    throw new Error('Method not implemented.');
+    return this.productsRepository.update(id, { available: false });
+  }
 
-        return await this.productsRepository.delete(id);
-    }
+  async deleteProductsById(id: string) {
+    const findProduct = await this.productsRepository.findOne({
+      where: { id },
+    });
+    if (!findProduct)
+      throw new NotFoundException(`No se encontró el producto con id: ${id}`);
 
+    return await this.productsRepository.delete(id);
+  }
+
+  async getLatestProducts(): Promise<Products[]> {
+    return await this.productsRepository.find({
+      relations: ['category'],
+      order: { createdAt: 'DESC' },
+      take: 10,
+    });
+  }
 }

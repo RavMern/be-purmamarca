@@ -15,8 +15,12 @@ export class ImagesService implements OnModuleInit {
       process.cwd(),
       'src/config/firebase/firebase-service-account.json'
     );
-    if (!fs.existsSync(serviceAccountPath)) {
-      throw new Error('Firebase service account file not found');
+    if (
+      !fs.existsSync(serviceAccountPath) ||
+      fs.lstatSync(serviceAccountPath).isDirectory()
+    ) {
+      console.log('Firebase service account file not found, skipping init');
+      return; // salteamos la inicialización
     }
 
     const serviceAccount = JSON.parse(
