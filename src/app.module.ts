@@ -12,6 +12,7 @@ import { CategoreiesModule } from './categories/categoreies.module';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { AvailableNowModule } from './available/available-now.module';
 import { MailerModule } from './mailer/mailer.module';
+import { PromotionsModule } from './promotions/promotions.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { MailerModule } from './mailer/mailer.module';
     FileUploadModule,
     AvailableNowModule,
     MailerModule,
+    PromotionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
