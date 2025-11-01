@@ -77,6 +77,12 @@ export class createProductDto {
   @IsBoolean()
   onSale: boolean;
 
+  @IsOptional()
+  @IsNumber()
+  @IsPositive({ message: 'El valor debe ser mayor a 0' })
+  priceOnSale?: number;
+
+
   @ApiProperty({
     description: 'Indica si el producto está disponible',
     example: true,
@@ -158,6 +164,11 @@ export class updateProductDto {
   @IsBoolean()
   @IsOptional()
   onSale?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  @IsPositive({ message: 'El valor debe ser mayor a 0' })
+  priceOnSale?: number;
 
   @ApiProperty({
     description: 'Indica si el producto está disponible',
