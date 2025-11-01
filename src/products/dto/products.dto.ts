@@ -37,37 +37,34 @@ export class createProductDto {
     description: 'ID de la categoría',
     example: '123e4567-e89b-12d3-a456-426614174000',
   })
-  @IsNotEmpty({ message: 'La categoría es requerida' })
   @IsString()
   @IsUUID('4', { message: 'El ID de la categoría debe ser un UUID válido' })
+  @IsNotEmpty({ message: 'La categoría es requerida' })
   categoryId: string;
 
   @ApiProperty({ description: 'Precio del producto', example: 2500 })
-  @IsNotEmpty({ message: 'El precio es requerido' })
   @IsNumber()
   @IsPositive({ message: 'El precio debe ser mayor a 0' })
+  @IsNotEmpty({ message: 'El precio es requerido' })
   price: number;
 
   @ApiProperty({ description: 'Stock disponible', example: 50 })
-  @IsNotEmpty({ message: 'El stock es requerido' })
   @IsNumber()
   @IsPositive({ message: 'El stock debe ser mayor a 0' })
+  @IsNotEmpty({ message: 'El stock es requerido' })
   stock: number;
 
   @ApiProperty({
     description: 'URLs de las imágenes del producto',
-    example: [
-      'https://example.com/image1.jpg',
-      'https://example.com/image2.jpg',
-    ],
+    example: ['https://example.com/image1.jpg'],
   })
-  @IsArray({ message: 'Las imágenes deben ser un array' })
-  @IsOptional({ message: 'Las imágenes son requeridas' })
-  imgs: string[];
+  @IsArray()
+  @IsOptional()
+  imgs?: string[];
 
   @ApiProperty({ description: 'Tamaño del producto', example: 'M' })
-  @IsNotEmpty({ message: 'El tamaño es requerido' })
   @IsString()
+  @IsNotEmpty({ message: 'El tamaño es requerido' })
   size: string;
 
   @ApiProperty({
@@ -77,9 +74,14 @@ export class createProductDto {
   @IsBoolean()
   onSale: boolean;
 
-  @IsOptional()
+  @ApiProperty({
+    description: 'Precio en oferta',
+    example: 3000,
+    required: false,
+  })
   @IsNumber()
-  @IsPositive({ message: 'El valor debe ser mayor a 0' })
+  @IsPositive({ message: 'El precio en oferta debe ser mayor a 0' })
+  @IsOptional()
   priceOnSale?: number;
 
   @ApiProperty({
@@ -89,6 +91,7 @@ export class createProductDto {
   @IsBoolean()
   available: boolean;
 }
+
 export class updateProductDto {
   @ApiProperty({
     description: 'Nombre del producto',
@@ -113,9 +116,9 @@ export class updateProductDto {
     example: '123e4567-e89b-12d3-a456-426614174000',
     required: false,
   })
-  @IsOptional()
   @IsString()
   @IsUUID('4', { message: 'El ID de la categoría debe ser un UUID válido' })
+  @IsOptional()
   categoryId?: string;
 
   @ApiProperty({
@@ -123,8 +126,9 @@ export class updateProductDto {
     example: 2500,
     required: false,
   })
-  @IsOptional()
   @IsNumber()
+  @IsPositive({ message: 'El precio debe ser mayor a 0' })
+  @IsOptional()
   price?: number;
 
   @ApiProperty({
@@ -132,9 +136,9 @@ export class updateProductDto {
     example: 50,
     required: false,
   })
-  @IsOptional()
   @IsNumber()
   @IsPositive({ message: 'El stock debe ser mayor a 0' })
+  @IsOptional()
   stock?: number;
 
   @ApiProperty({
@@ -169,9 +173,9 @@ export class updateProductDto {
     example: 3000,
     required: false,
   })
-  @IsOptional()
   @IsNumber()
-  @IsPositive({ message: 'El valor debe ser mayor a 0' })
+  @IsPositive({ message: 'El precio en oferta debe ser mayor a 0' })
+  @IsOptional()
   priceOnSale?: number;
 
   @ApiProperty({
