@@ -79,9 +79,9 @@ export class createProductDto {
     example: 3000,
     required: false,
   })
+  @IsOptional()
   @IsNumber()
   @IsPositive({ message: 'El precio en oferta debe ser mayor a 0' })
-  @IsOptional()
   priceOnSale?: number;
 
   @ApiProperty({

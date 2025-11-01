@@ -59,13 +59,12 @@ export class ProductsService {
   }
 
   async createProducts(data: createProductDto): Promise<Products> {
-    // Validar que la categoría existe
+    // Validar categoría
     if (!data.categoryId) {
       throw new BadRequestException('La categoría es requerida');
     }
 
     try {
-      // Verificar que la categoría existe
       await this.categoriesService.findOne(data.categoryId);
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -76,9 +75,15 @@ export class ProductsService {
       throw error;
     }
 
-    const createProductDB = await this.productsRepository.create(data);
+    // 🔑 No enviar priceOnSale si onSale es false o priceOnSale no es válido
+    if (!data.onSale || !data.priceOnSale || data.priceOnSale <= 0) {
+      delete data.priceOnSale;
+    }
+
+    const createProductDB = this.productsRepository.create(data);
     return await this.productsRepository.save(createProductDB);
   }
+
   async getProductsById(id: string): Promise<Products> {
     const foundedProduct = await this.productsRepository.findOne({
       where: { id },
