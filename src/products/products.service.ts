@@ -156,9 +156,8 @@ export class ProductsService {
     return await this.productsRepository.update(id, data);
   }
 
-  patchProductsById(id: string) {
-    throw new Error('Method not implemented.');
-    return this.productsRepository.update(id, { available: false });
+  async patchProductsById(id: string, partialData: Partial<createProductDto>) {
+    return this.productsRepository.update(id, partialData);
   }
 
   async deleteProductsById(id: string) {
