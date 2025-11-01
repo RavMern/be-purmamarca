@@ -1,12 +1,12 @@
 import {
   Injectable,
-  NotFoundException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
-import { FileUploadRepository } from './file-upload.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Products } from 'src/entities/product.entity';
 import { Repository } from 'typeorm';
+import { FileUploadRepository } from './file-upload.repository';
 
 @Injectable()
 export class FileUploadService {
@@ -66,4 +66,23 @@ export class FileUploadService {
 
     return updatedProduct;
   }
+  async uploadTempFiles(files: Express.Multer.File[]) {
+  try {
+    const uploadedFiles = await Promise.all(
+      files.map(file => this.fileUploadRepository.uploadFile(file))
+    );
+
+    const urls = uploadedFiles
+      .filter(file => file && typeof file.secure_url === 'string')
+      .map(file => file.secure_url);
+
+    return urls;
+  } catch (error) {
+    throw new InternalServerErrorException(
+      'Error uploading temporary files: ' +
+        (error instanceof Error ? error.message : String(error)),
+    );
+  }
+}
+
 }
