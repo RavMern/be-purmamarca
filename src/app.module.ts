@@ -11,6 +11,7 @@ import { AvailableNowModule } from './available/available-now.module';
 import { CategoreiesModule } from './categories/categoreies.module';
 import { FileUploadModule } from './file-upload/file-upload.module';
 import { ProductsModule } from './products/products.module';
+import { PromotionsModule } from './promotions/promotions.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ProductsModule } from './products/products.module';
     CategoreiesModule,
     FileUploadModule,
     AvailableNowModule,
+    PromotionsModule,
     // MailerModule,
   ],
   controllers: [AppController],

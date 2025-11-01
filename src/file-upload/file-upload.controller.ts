@@ -75,4 +75,34 @@ export class FileUploadController {
 
     return await this.fileUploadService.uploadFiles(files, productId);
   }
+
+@Post('upload-images-no-id/temp')
+@UseInterceptors(FilesInterceptor('files', 10))
+@ApiOperation({ summary: 'Subir imágenes temporales (sin asociar a producto)' })
+@ApiConsumes('multipart/form-data')
+async uploadTempFiles(
+  @UploadedFiles(
+    new ParseFilePipe({
+      validators: [
+        new MaxFileSizeValidator({
+          maxSize: 20000000,
+          message: 'File is too large',
+        }),
+        new FileTypeValidator({ fileType: /(jpg|jpeg|png|gif|webp)$/ }),
+      ],
+    })
+  )
+  files: Express.Multer.File[],
+) {
+  if (!files || files.length === 0) {
+    throw new BadRequestException('Files are required');
+  }
+
+  const uploadedFiles = await this.fileUploadService.uploadTempFiles(files);
+  return {
+    message: 'Files uploaded successfully',
+    urls: uploadedFiles,
+  };
+}
+
 }
