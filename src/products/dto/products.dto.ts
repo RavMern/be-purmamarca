@@ -11,6 +11,9 @@ import {
   IsUUID,
 } from 'class-validator';
 
+// ----------------------------------------------------
+// CREATE PRODUCT DTO
+// ----------------------------------------------------
 export class createProductDto {
   @ApiProperty({
     description: 'Nombre del producto',
@@ -60,9 +63,10 @@ export class createProductDto {
       'https://example.com/image1.jpg',
       'https://example.com/image2.jpg',
     ],
+    required: false, // Las imágenes son opcionales en la creación, se suben después.
   })
   @IsArray({ message: 'Las imágenes deben ser un array' })
-  @IsOptional({ message: 'Las imágenes son requeridas' })
+  @IsOptional() // Se usa @IsOptional() para permitir que el campo no exista
   imgs: string[];
 
   @ApiProperty({ description: 'Tamaño del producto', example: 'M' })
@@ -77,11 +81,16 @@ export class createProductDto {
   @IsBoolean()
   onSale: boolean;
 
+  // ➡️ CORRECCIÓN CLAVE: Se añade @ApiProperty() para whitelist en NestJS
+  @ApiProperty({
+    description: 'Precio de rebaja (solo si está en oferta)',
+    example: 2000,
+    required: false, // Indicador para Swagger
+  })
   @IsOptional()
   @IsNumber()
   @IsPositive({ message: 'El valor debe ser mayor a 0' })
   priceOnSale?: number;
-
 
   @ApiProperty({
     description: 'Indica si el producto está disponible',
@@ -90,6 +99,10 @@ export class createProductDto {
   @IsBoolean()
   available: boolean;
 }
+
+// ----------------------------------------------------
+// UPDATE PRODUCT DTO
+// ----------------------------------------------------
 export class updateProductDto {
   @ApiProperty({
     description: 'Nombre del producto',
@@ -165,6 +178,12 @@ export class updateProductDto {
   @IsOptional()
   onSale?: boolean;
 
+  // ➡️ CORRECCIÓN CLAVE: Se añade @ApiProperty() para whitelist en NestJS
+  @ApiProperty({
+    description: 'Precio de rebaja (solo si está en oferta)',
+    example: 2000,
+    required: false,
+  })
   @IsOptional()
   @IsNumber()
   @IsPositive({ message: 'El valor debe ser mayor a 0' })
