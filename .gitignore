@@ -87,10 +87,11 @@ secrets.json
 credentials.json
 
 # Service account files
-# *service-account*.json
+*service-account*.json
 *serviceAccount*.json
 google-service-account.json
 google-credentials.json
+firebase-service-account.json
 
 # Firebase Admin SDK
 admin-sdk-*.json
