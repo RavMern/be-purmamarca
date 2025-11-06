@@ -20,8 +20,8 @@ services:
     volumes:
       - ./:/usr/src/app:delegated
       - /usr/src/app/node_modules
-      # monta el firebase json local (lee más abajo dónde ponerlo)
-      - ./src/config/firebase/firebase-service-account.json:/usr/src/app/src/config/firebase/firebase-service-account.json:ro
+      # monta el firebase json local desde la raíz del proyecto
+      - ./firebase-service-account.json:/usr/src/app/firebase-service-account.json:ro
     environment:
       - DB_HOST=db
       - DB_PORT=5432
@@ -31,8 +31,7 @@ services:
       - PORT=3000
       - NODE_ENV=development
       - JWT_SECRET=${JWT_SECRET:-JuanRomanRiquelme}
-      - FIREBASE_CREDENTIALS=/usr/src/app/src/config/firebase/firebase-service-account.json
-      - STORAGE_URL=imgstorage-d91df.appspot.com
+      - FIREBASE_CREDENTIALS=/usr/src/app/firebase-service-account.json
     ports:
       - '3000:3000'
     depends_on:

@@ -55,16 +55,14 @@ pids
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# Firebase configuration files and sensitive data
-src/config/firebase/*.json
-src/config/firebase-service-account.json
-firebase-service-account.json
-firebase-adminsdk-*.json
-firebase-config.json
-firebase.json
-.firebaserc
-firebase-debug.log
-firebase-debug.*.log
+# # Firebase configuration files and sensitive data
+# # src/config/firefirebase-adminsdk-*.json
+# firebase-config.json
+# # firebase.json
+# .firebaserc
+# firebase-debug.log
+# firebase-debug.*.logbase/*.json
+
 
 # Cloudinary configuration and sensitive data
 src/config/cloudinary.json
@@ -89,13 +87,12 @@ secrets.json
 credentials.json
 
 # Service account files
-*service-account*.json
+# *service-account*.json
 *serviceAccount*.json
 google-service-account.json
 google-credentials.json
 
 # Firebase Admin SDK
-firebase-admin-*.json
 admin-sdk-*.json
 
 # Cloudinary upload presets and settings

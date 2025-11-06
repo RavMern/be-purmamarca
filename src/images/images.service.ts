@@ -11,10 +11,11 @@ export class ImagesService implements OnModuleInit {
 
   onModuleInit() {
     const storageUrl = process.env.STORAGE_URL;
-    const serviceAccountPath = path.resolve(
-      process.cwd(),
-      'src/config/firebase/firebase-service-account.json'
-    );
+    // Use FIREBASE_CREDENTIALS env var if available, otherwise fallback to root
+    const serviceAccountPath = process.env.FIREBASE_CREDENTIALS
+      ? process.env.FIREBASE_CREDENTIALS
+      : path.resolve(process.cwd(), 'firebase-service-account.json');
+
     if (
       !fs.existsSync(serviceAccountPath) ||
       fs.lstatSync(serviceAccountPath).isDirectory()

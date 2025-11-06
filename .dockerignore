@@ -4,3 +4,4 @@ dist
 .git
 .gitignore
 src/config/firebase/firebase-service-account.json
+# El archivo firebase-service-account.json en la raíz NO se ignora para que esté disponible en el build
