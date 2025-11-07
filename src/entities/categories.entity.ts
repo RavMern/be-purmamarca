@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   Column,
   Entity,
-  JoinColumn,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -37,6 +36,5 @@ export class Categories {
     description: 'Lista de productos asociados',
   })
   @OneToMany(() => Products, products => products.category)
-  @JoinColumn()
   products: Products[];
 }

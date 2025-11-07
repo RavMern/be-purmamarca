@@ -139,16 +139,12 @@ export class ProductsService {
       }
     }
 
-    console.log('data.stock', data.stock);
-
     if (data.stock) {
       const checkStock = await this.productsRepository.findOne({
         where: { id },
       });
-      console.log('checkStock.stock', checkStock?.stock);
 
       if (checkStock?.stock === 0) {
-        console.log('El stock de este producto era 0 antes de ser actualizado');
         await this.availableNowService.notifyUsersWhenStockRestored(id);
       }
     }

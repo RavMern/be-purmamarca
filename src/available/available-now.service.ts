@@ -3,12 +3,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateAvailableNowDto } from './addWaitingProduct.dto';
-import { AvailabeNow } from 'src/entities/availableNow.entity';
-import { Repository } from 'typeorm';
-import { Products } from 'src/entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import sgMail from 'src/config/mailer.config';
+import { AvailabeNow } from 'src/entities/availableNow.entity';
+import { Products } from 'src/entities/product.entity';
+import { Repository } from 'typeorm';
+import { CreateAvailableNowDto } from './addWaitingProduct.dto';
 
 @Injectable()
 export class AvailableNowService {
@@ -61,8 +61,6 @@ export class AvailableNowService {
     });
 
     if (!product) {
-      console.log('No se encontró el producto con id: ', productId);
-
       throw new Error(`No se encontró el producto con id: ${productId}`);
     }
 
@@ -104,11 +102,9 @@ export class AvailableNowService {
     };
     try {
       await sgMail.send(msg);
-      console.log('Email enviado');
     } catch (error) {
       console.error('Error sending newsletter email:', error);
     }
-    console.log('proceso terminado');
     return 'ok';
   }
 }

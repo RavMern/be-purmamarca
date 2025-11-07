@@ -3,7 +3,6 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToMany,
-  JoinColumn,
 } from 'typeorm';
 import { Orders } from './orders.entity';
 
@@ -40,6 +39,5 @@ export class Users {
   isAdmin: boolean;
 
   @OneToMany(() => Orders, order => order.user)
-  @JoinColumn({ name: 'orders_id' })
   orders: Orders[];
 }

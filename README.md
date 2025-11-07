@@ -32,6 +32,39 @@
 $ npm install
 ```
 
+## Configuración de Variables de Entorno
+
+Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+
+```env
+# Database (Supabase)
+# Opción 1: Usar DB_URL con conexión directa + pooler separado (RECOMENDADO)
+DB_URL=postgres://postgres:[PASSWORD]@db.PROJECT_REF.supabase.co:5432/postgres
+SUPABASE_POOLER_URL=aws-0-[REGION].pooler.supabase.com:6543
+
+# Opción 2: Usar DB_URL directamente con pooler
+# DB_URL=postgres://postgres.PROJECT_REF:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
+
+# IMPORTANTE: NO uses conexión directa (causa error ENOTFOUND)
+# SUPABASE_USE_DIRECT=true  ❌ NO USAR
+
+# JWT
+JWT_SECRET=tu-secreto-jwt
+
+# Firebase Storage (para subida de imágenes)
+FIREBASE_CREDENTIALS=src/config/firebase-service-account.json
+STORAGE_URL=tu-proyecto-firebase.appspot.com  # Opcional, se usa el del service account si no se especifica
+
+# Seed automático (solo desarrollo)
+NODE_ENV=development
+RUN_SEED_ON_START=true  # Setear a 'true' para ejecutar seed al iniciar
+FORCE_SEED=false        # Setear a 'true' para forzar seed incluso si hay datos
+```
+
+### ⚠️ Solución de Problemas de Conexión a Supabase
+
+Si ves el error `ENOTFOUND db.xxx.supabase.co`, consulta [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) para instrucciones detalladas sobre cómo configurar el pooler correctamente.
+
 ## Compile and run the project
 
 ```bash
@@ -44,6 +77,29 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
+
+## Seed de Datos
+
+El proyecto incluye un sistema de seed automático que se ejecuta al iniciar la aplicación (solo en desarrollo).
+
+### Configuración
+
+1. **Habilitar seed automático**: Agrega `RUN_SEED_ON_START=true` en tu `.env`
+2. **Forzar seed**: Si quieres que el seed se ejecute incluso cuando ya hay datos, agrega `FORCE_SEED=true`
+
+### Ejecutar seed manualmente
+
+```bash
+# Ejecutar el seed manualmente
+$ npm run seed
+```
+
+### Datos que se crean
+
+- **6 categorías**: Lámparas de Sal, Velas, Inciensos, Difusores, Cristales, Sahumerios
+- **18 productos**: 3 productos por categoría con datos de ejemplo
+
+**Nota**: El seed automático solo se ejecuta en modo desarrollo (`NODE_ENV=development`) y cuando la base de datos está vacía (a menos que `FORCE_SEED=true`).
 
 ## Run tests
 

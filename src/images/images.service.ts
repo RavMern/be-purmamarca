@@ -11,27 +11,66 @@ export class ImagesService implements OnModuleInit {
 
   onModuleInit() {
     const storageUrl = process.env.STORAGE_URL;
-    // Use FIREBASE_CREDENTIALS env var if available, otherwise fallback to root
-    const serviceAccountPath = process.env.FIREBASE_CREDENTIALS
-      ? process.env.FIREBASE_CREDENTIALS
-      : path.resolve(process.cwd(), 'firebase-service-account.json');
+    let serviceAccount: ServiceAccount;
 
-    if (
-      !fs.existsSync(serviceAccountPath) ||
-      fs.lstatSync(serviceAccountPath).isDirectory()
-    ) {
-      console.log('Firebase service account file not found, skipping init');
-      return; // salteamos la inicialización
+    try {
+      // 1. Intentar leer desde variable de entorno (JSON string o ruta de archivo)
+      if (process.env.FIREBASE_CREDENTIALS) {
+        const credentialsValue = process.env.FIREBASE_CREDENTIALS.trim();
+
+        // Si es JSON (empieza con {), parsearlo directamente
+        if (credentialsValue.startsWith('{')) {
+          try {
+            serviceAccount = JSON.parse(credentialsValue) as ServiceAccount;
+          } catch (parseError) {
+            // Si falla el parse, saltear inicialización
+            return;
+          }
+        } else {
+          // Si no es JSON, tratar como ruta de archivo
+          const serviceAccountPath = credentialsValue;
+
+          if (
+            !fs.existsSync(serviceAccountPath) ||
+            fs.lstatSync(serviceAccountPath).isDirectory()
+          ) {
+            return; // salteamos la inicialización
+          }
+
+          serviceAccount = JSON.parse(
+            fs.readFileSync(serviceAccountPath, 'utf-8')
+          ) as ServiceAccount;
+        }
+      } else {
+        // 2. Intentar leer desde archivo en ubicación común
+        const serviceAccountPath = path.resolve(
+          process.cwd(),
+          'firebase-service-account.json'
+        );
+
+        if (
+          !fs.existsSync(serviceAccountPath) ||
+          fs.lstatSync(serviceAccountPath).isDirectory()
+        ) {
+          return; // salteamos la inicialización
+        }
+
+        serviceAccount = JSON.parse(
+          fs.readFileSync(serviceAccountPath, 'utf-8')
+        ) as ServiceAccount;
+      }
+    } catch (error) {
+      // Si hay error, salteamos la inicialización silenciosamente
+      return;
     }
 
-    const serviceAccount = JSON.parse(
-      fs.readFileSync(serviceAccountPath, 'utf-8')
-    ) as ServiceAccount;
-
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      storageBucket: storageUrl,
-    });
+    // Verificar si Firebase ya está inicializado
+    if (admin.apps.length === 0) {
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        storageBucket: storageUrl || `${serviceAccount.projectId}.appspot.com`,
+      });
+    }
 
     this.bucket = admin.storage().bucket();
   }

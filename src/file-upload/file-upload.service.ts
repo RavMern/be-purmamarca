@@ -42,10 +42,10 @@ export class FileUploadService {
       files.map(file => this.fileUploadRepository.uploadFile(file))
     );
 
-    // Obtener URLs de manera segura
+    // Obtener URLs de manera segura (Firebase devuelve 'url' o 'secure_url')
     const newImgs: string[] = uploadedFiles
-      .filter(file => file && typeof file.secure_url === 'string')
-      .map(file => file.secure_url);
+      .filter(file => file && (file.url || file.secure_url))
+      .map(file => file.url || file.secure_url || '');
 
     const existingImgs: string[] = Array.isArray(product.imgs)
       ? product.imgs
@@ -67,22 +67,22 @@ export class FileUploadService {
     return updatedProduct;
   }
   async uploadTempFiles(files: Express.Multer.File[]) {
-  try {
-    const uploadedFiles = await Promise.all(
-      files.map(file => this.fileUploadRepository.uploadFile(file))
-    );
+    try {
+      const uploadedFiles = await Promise.all(
+        files.map(file => this.fileUploadRepository.uploadFile(file))
+      );
 
-    const urls = uploadedFiles
-      .filter(file => file && typeof file.secure_url === 'string')
-      .map(file => file.secure_url);
+      const urls = uploadedFiles
+        .filter(file => file && (file.url || file.secure_url))
+        .map(file => file.url || file.secure_url || '');
 
-    return urls;
-  } catch (error) {
-    throw new InternalServerErrorException(
-      'Error uploading temporary files: ' +
-        (error instanceof Error ? error.message : String(error)),
-    );
+      return urls;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Error uploading temporary files: ' +
+          (error instanceof Error ? error.message : String(error)),
+      );
+    }
   }
-}
 
 }

@@ -138,7 +138,6 @@ export class CategoriesController {
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File
   ): Promise<{ message: string; imageUrl: string }> {
-    console.log('Archivo recibido:', file);
     if (!file || !file.buffer) {
       throw new BadRequestException('No se ha proporcionado ninguna imagen');
     }

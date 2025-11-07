@@ -1,9 +1,21 @@
-// seed_products.js
-// Para ejecutar: npm run seed
-// O: node --loader ./node_modules/node-fetch-loader.mjs seed_products.js
-// O renombra el archivo a seed_products.mjs y ejecuta: node seed_products.mjs
+// seed_products.mjs
+// Script para poblar la base de datos con categorías y productos de ejemplo
+//
+// Para ejecutar:
+//    npm run seed
+// O directamente:
+//    node seed_products.mjs
+//
+// IMPORTANTE: Antes de ejecutar, configura tus credenciales de admin:
+//    - ADMIN_EMAIL: Tu email de usuario admin
+//    - ADMIN_PASSWORD: Tu contraseña de admin
+//
+// Este script:
+// 1. Hace login para obtener token JWT
+// 2. Elimina productos y categorías existentes (opcional)
+// 3. Crea 6 categorías
+// 4. Crea 18 productos (3 por categoría)
 
-// Nota: node-fetch v3 requiere ES modules, así que usamos import
 import fetch from 'node-fetch';
 
 const API = 'http://localhost:3000/api';
@@ -306,7 +318,7 @@ async function deleteAllProducts(token) {
       const deleteResponse = await fetch(`${API}/products/${product.id}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -343,15 +355,13 @@ async function deleteAllCategories(token) {
       const deleteResponse = await fetch(`${API}/categories/${category.id}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
 
       if (!deleteResponse.ok) {
         const errorText = await deleteResponse.text();
-        console.warn(
-          `⚠️  No se pudo eliminar categoría ${category.id}: ${errorText}`
-        );
+        console.warn(`⚠️  No se pudo eliminar categoría ${category.id}: ${errorText}`);
       }
     }
 
@@ -384,16 +394,14 @@ async function seed() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(cat),
       });
 
       if (!res.ok) {
         const errorText = await res.text();
-        throw new Error(
-          `Error al crear categoría ${cat.name}: ${res.status} - ${errorText}`
-        );
+        throw new Error(`Error al crear categoría ${cat.name}: ${res.status} - ${errorText}`);
       }
 
       const data = await res.json();
@@ -414,7 +422,7 @@ async function seed() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify({ ...p, categoryId: catId }),
         });
