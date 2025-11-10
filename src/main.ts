@@ -14,15 +14,11 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   // CORS configurado para tu front
-  app.enableCors({
-    origin: [
-      'http://localhost:3001',
-      process.env.URL1,
-      process.env.URL2,
-    ].filter(Boolean),
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
-  });
+app.enableCors({
+  origin: '*', // Permite todas las origins
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  credentials: false, // IMPORTANTE: con '*' debes poner credentials en false
+});
 
   // Validación global de DTOs
   app.useGlobalPipes(
