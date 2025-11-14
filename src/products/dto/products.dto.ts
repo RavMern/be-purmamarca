@@ -1,4 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+/* eslint-disable prettier/prettier */
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
   IsBoolean,
@@ -10,141 +11,188 @@ import {
   IsUUID,
 } from 'class-validator';
 
+// ----------------------------------------------------
+// CREATE PRODUCT DTO
+// ----------------------------------------------------
 export class createProductDto {
-  @ApiProperty({ example: 'Camiseta Rock', description: 'Nombre del producto' })
+  @ApiProperty({
+    description: 'Nombre del producto',
+    example: 'Camiseta de algodón',
+  })
   @IsString()
   @IsNotEmpty({ message: 'El nombre del producto es requerido' })
   name: string;
 
   @ApiProperty({
-    example: 'Camiseta de algodón talla M',
     description: 'Descripción del producto',
+    example: 'Camiseta de algodón 100% orgánico',
   })
   @IsString()
   @IsNotEmpty({ message: 'La descripción del producto es requerida' })
   description: string;
 
-  @ApiProperty({ example: 'Negro', description: 'Color del producto' })
+  @ApiProperty({ description: 'Color del producto', example: 'Azul' })
   @IsString()
   @IsNotEmpty({ message: 'El color del producto es requerido' })
   color: string;
 
   @ApiProperty({
-    example: 'uuid-de-categoria',
-    description: 'ID de la categoría del producto',
+    description: 'ID de la categoría',
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @IsNotEmpty({ message: 'La categoría es requerida' })
   @IsString()
   @IsUUID('4', { message: 'El ID de la categoría debe ser un UUID válido' })
   categoryId: string;
 
-  @ApiProperty({ example: 1999, description: 'Precio del producto en pesos' })
+  @ApiProperty({ description: 'Precio del producto', example: 2500 })
   @IsNotEmpty({ message: 'El precio es requerido' })
   @IsNumber()
   @IsPositive({ message: 'El precio debe ser mayor a 0' })
   price: number;
 
-  @ApiProperty({ example: 10, description: 'Stock disponible del producto' })
+  @ApiProperty({ description: 'Stock disponible', example: 50 })
   @IsNotEmpty({ message: 'El stock es requerido' })
   @IsNumber()
   @IsPositive({ message: 'El stock debe ser mayor a 0' })
   stock: number;
 
   @ApiProperty({
-    example: ['img1.jpg', 'img2.jpg'],
     description: 'URLs de las imágenes del producto',
+    example: [
+      'https://example.com/image1.jpg',
+      'https://example.com/image2.jpg',
+    ],
+    required: false, // Las imágenes son opcionales en la creación, se suben después.
   })
   @IsArray({ message: 'Las imágenes deben ser un array' })
-  @IsNotEmpty({ message: 'Las imágenes son requeridas' })
+  @IsOptional() // Se usa @IsOptional() para permitir que el campo no exista
   imgs: string[];
 
-  @ApiProperty({ example: 'M', description: 'Tamaño del producto' })
+  @ApiProperty({ description: 'Tamaño del producto', example: 'M' })
   @IsNotEmpty({ message: 'El tamaño es requerido' })
   @IsString()
   size: string;
 
   @ApiProperty({
-    example: true,
     description: 'Indica si el producto está en oferta',
+    example: false,
   })
   @IsBoolean()
   onSale: boolean;
 
+  // ➡️ CORRECCIÓN CLAVE: Se añade @ApiProperty() para whitelist en NestJS
   @ApiProperty({
-    example: true,
+    description: 'Precio de rebaja (solo si está en oferta)',
+    example: 2000,
+    required: false, // Indicador para Swagger
+  })
+  @IsOptional()
+  @IsNumber()
+  @IsPositive({ message: 'El valor debe ser mayor a 0' })
+  priceOnSale?: number;
+
+  @ApiProperty({
     description: 'Indica si el producto está disponible',
+    example: true,
   })
   @IsBoolean()
   available: boolean;
 }
 
+// ----------------------------------------------------
+// UPDATE PRODUCT DTO
+// ----------------------------------------------------
 export class updateProductDto {
-  @ApiPropertyOptional({
-    example: 'Camiseta Rock',
+  @ApiProperty({
     description: 'Nombre del producto',
+    example: 'Camiseta de algodón',
+    required: false,
   })
   @IsString()
   @IsOptional()
   name?: string;
 
-  @ApiPropertyOptional({
-    example: 'Camiseta de algodón talla M',
+  @ApiProperty({
     description: 'Descripción del producto',
+    example: 'Camiseta de algodón 100% orgánico',
+    required: false,
   })
   @IsString()
   @IsOptional()
   description?: string;
 
-  @ApiPropertyOptional({
-    example: 'uuid-de-categoria',
-    description: 'ID de la categoría del producto',
+  @ApiProperty({
+    description: 'ID de la categoría',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    required: false,
   })
   @IsOptional()
   @IsString()
   @IsUUID('4', { message: 'El ID de la categoría debe ser un UUID válido' })
   categoryId?: string;
 
-  @ApiPropertyOptional({
-    example: 1999,
-    description: 'Precio del producto en pesos',
+  @ApiProperty({
+    description: 'Precio del producto',
+    example: 2500,
+    required: false,
   })
   @IsOptional()
   @IsNumber()
   price?: number;
 
-  @ApiPropertyOptional({
-    example: 10,
-    description: 'Stock disponible del producto',
+  @ApiProperty({
+    description: 'Stock disponible',
+    example: 50,
+    required: false,
   })
   @IsOptional()
   @IsNumber()
   @IsPositive({ message: 'El stock debe ser mayor a 0' })
   stock?: number;
 
-  @ApiPropertyOptional({
-    example: ['img1.jpg', 'img2.jpg'],
+  @ApiProperty({
     description: 'URLs de las imágenes del producto',
+    example: ['https://example.com/image1.jpg'],
+    required: false,
   })
   @IsArray()
   @IsOptional()
   imgs?: string[];
 
-  @ApiPropertyOptional({ example: 'M', description: 'Tamaño del producto' })
+  @ApiProperty({
+    description: 'Tamaño del producto',
+    example: 'M',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   size?: string;
 
-  @ApiPropertyOptional({
-    example: true,
+  @ApiProperty({
     description: 'Indica si el producto está en oferta',
+    example: false,
+    required: false,
   })
   @IsBoolean()
   @IsOptional()
   onSale?: boolean;
 
-  @ApiPropertyOptional({
-    example: true,
+  // ➡️ CORRECCIÓN CLAVE: Se añade @ApiProperty() para whitelist en NestJS
+  @ApiProperty({
+    description: 'Precio de rebaja (solo si está en oferta)',
+    example: 2000,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  @IsPositive({ message: 'El valor debe ser mayor a 0' })
+  priceOnSale?: number;
+
+  @ApiProperty({
     description: 'Indica si el producto está disponible',
+    example: true,
+    required: false,
   })
   @IsBoolean()
   @IsOptional()

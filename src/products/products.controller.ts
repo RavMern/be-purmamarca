@@ -1,7 +1,6 @@
+/* eslint-disable prettier/prettier */
 import {
-  BadRequestException,
-  Body,
-  Controller,
+  BadRequestException, Body, Controller,
   Delete,
   Get,
   Param,
@@ -12,6 +11,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -29,12 +29,18 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Crear nuevo producto' })
+  @ApiOperation({ summary: 'Crear un nuevo producto' })
+  @ApiBody({ type: createProductDto })
   @ApiResponse({
     status: 201,
     description: 'Producto creado exitosamente',
     type: Products,
   })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos o categoría no encontrada',
+  })
+  @ApiBearerAuth()
   async createProducts(@Body() data: createProductDto): Promise<Products> {
     if (!data) throw new BadRequestException('Data not received');
     if (!data.categoryId)
@@ -44,45 +50,55 @@ export class ProductsController {
 
   @Get()
   @ApiOperation({ summary: 'Obtener todos los productos' })
-  @ApiResponse({
-    status: 200,
-    description: 'Lista de productos',
-    type: [Products],
-  })
   getProducts() {
     return this.productsService.getProducts();
   }
 
+  @Get('latest')
+  @ApiOperation({ summary: 'Obtener los últimos 10 productos agregados' })
+  getLatestProducts() {
+    return this.productsService.getLatestProducts();
+  }
+
   @Get(':id')
-  @ApiOperation({ summary: 'Obtener producto por ID' })
-  @ApiParam({ name: 'id', description: 'ID del producto', type: String })
-  @ApiResponse({
-    status: 200,
-    description: 'Producto encontrado',
-    type: Products,
-  })
+  @ApiOperation({ summary: 'Obtener un producto por ID' })
+  @ApiParam({ name: 'id', description: 'ID del producto', type: 'string' })
   getProductsById(@Param('id') id: string): Promise<Products> {
     return this.productsService.getProductsById(id);
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Actualizar producto por ID' })
-  @ApiParam({ name: 'id', description: 'ID del producto', type: String })
+  @ApiOperation({ summary: 'Actualizar un producto completo' })
+  @ApiParam({ name: 'id', description: 'ID del producto', type: 'string' })
   @ApiBody({ type: updateProductDto })
+  @ApiBearerAuth()
   updateProductsById(@Param('id') id: string, @Body() data: updateProductDto) {
     return this.productsService.updateProductsById(id, data);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Actualizar parcialmente producto por ID' })
-  @ApiParam({ name: 'id', description: 'ID del producto', type: String })
-  patchProductsByIdPatch(@Param('id') id: string) {
-    return this.productsService.patchProductsById(id);
+  @ApiOperation({
+    summary:
+      'Actualizar parcialmente un producto (por ejemplo disponible o stock)',
+  })
+  @ApiParam({ name: 'id', description: 'ID del producto', type: 'string' })
+  @ApiBody({
+    schema: {
+      example: { available: true, stock: 10 },
+    },
+  })
+  @ApiBearerAuth()
+  patchProductsById(
+    @Param('id') id: string,
+    @Body() partialData: Partial<Products>
+  ) {
+    return this.productsService.patchProductsById(id, partialData);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Eliminar producto por ID' })
-  @ApiParam({ name: 'id', description: 'ID del producto', type: String })
+  @ApiOperation({ summary: 'Eliminar un producto' })
+  @ApiParam({ name: 'id', description: 'ID del producto', type: 'string' })
+  @ApiBearerAuth()
   deleteProductsById(@Param('id') id: string) {
     return this.productsService.deleteProductsById(id);
   }
